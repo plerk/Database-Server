@@ -1,0 +1,5 @@
+Capture::Tiny
+ExtUtils::MakeMaker
+Moose
+Test::More
+namespace::autoclean
