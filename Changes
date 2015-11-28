@@ -1,6 +1,11 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+  - Old create method renamed to init
+  - New create is a class method to create and init an
+    instance
+  - Added fallback restart method (stop, start)
+  - Database::Server->generate_port class method
 
 0.01      2015-11-24 11:17:15 -0500
   - initial version

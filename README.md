@@ -2,6 +2,14 @@
 
 Base classes and roles for interacting with database server instances
 
+# METHODS
+
+## generate\_port
+
+    Database::Server->generate_port;
+
+Returns an unused TCP port number.
+
 # AUTHOR
 
 Graham Ollis &lt;plicease@cpan.org>

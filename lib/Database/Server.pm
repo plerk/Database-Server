@@ -6,15 +6,31 @@ package Database::Server {
 
   # ABSTRACT: Base classes and roles for interacting with database server instances
 
+=head1 METHODS
+
+=head2 generate_port
+
+ Database::Server->generate_port;
+
+Returns an unused TCP port number.
+
+=cut
+
+  sub generate_port
+  {
+    require IO::Socket::IP;
+    IO::Socket::IP->new(Listen => 5, LocalAddr => '127.0.0.1')->sockport;
+  }
+
 }
 
 package Database::Server::Role::Server {
-
 
   use Moose::Role;
   use namespace::autoclean;
   
   requires 'create';
+  requires 'init';
   requires 'start';
   requires 'stop';
   requires 'is_up';
@@ -23,6 +39,13 @@ package Database::Server::Role::Server {
   {
     my($self, @command) = @_;
     Database::Server::CommandResult->new(@command);
+  }
+  
+  sub restart
+  {
+    my($self) = @_;
+    $self->stop if $self->is_up;
+    $self->start;
   }
 
 }

@@ -14,7 +14,7 @@ do {
   
   with 'Database::Server::Role::Server';
 
-  has _created => (
+  has _init => (
     is      => 'rw',
     default => 0,
   );
@@ -26,22 +26,28 @@ do {
   
   sub create
   {
+    my($class) = @_;
+    croak "TODO";
+  }
+  
+  sub init
+  {
     my($self) = @_;
-    croak "already created" if $self->_created;
-    $self->_created(1);
+    croak "already init" if $self->_init;
+    $self->_init(1);
   }
   
   sub start
   {
     my($self) = @_;
-    croak "must first create" if $self->_created;
+    croak "must first init" if $self->_init;
     $self->_up(1);
   }
   
   sub stop
   {
     my($self) = @_;
-    croak "must first create" if $self->_created;
+    croak "must first init" if $self->_init;
     $self->_up(0);
   }
   
