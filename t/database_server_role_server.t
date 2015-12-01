@@ -1,12 +1,11 @@
 use strict;
 use warnings;
+use 5.020;
 use Test::More tests => 1;
 use Database::Server;
 
-do {
-
-  package
-    Database::Server::FooSQL;
+package
+  Database::Server::FooSQL {
   
   use Moose;
   use Carp qw( croak );
@@ -56,14 +55,19 @@ do {
     shift->_up;
   }
 
-};
+}
 
 subtest 'Database::Server::Role::Server#run' => sub {
 
-  plan tests => 2;
+  plan tests => 3;
   my $server = Database::Server::FooSQL->new;
   
   is $server->run($^X, -E => 'exit 0')->is_success, 1, 'good command';
-  is $server->run($^X, -E => 'exit 2')->is_success, '', 'bad command';
+  is $server->run($^X, -E => 'exit 2', sub { shift })->is_success, '', 'bad command';
+  
+  eval { $server->run($^X, -E => 'say "out"; say STDERR "error"; exit 2') };
+  like $@, qr{'% .*?' failed with exit 2}, 'exception match';
+  note "error = $@";
 
 };
+

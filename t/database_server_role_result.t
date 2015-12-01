@@ -17,6 +17,8 @@ do {
   );
 
   sub is_success { shift->ok }
+  
+  sub as_string { shift->is_success ? 'looks good' : 'looks bad' }
 };
 
 ok(Database::Server::MyResult->new(ok => 1)->is_success, 'is_success');

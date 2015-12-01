@@ -37,8 +37,11 @@ package Database::Server::Role::Server {
 
   sub run
   {
+    my $error_check = ref $_[-1] eq 'CODE'
+      ? pop 
+      : sub { my $result = shift; die $result unless $result->is_success; $result };
     my($self, @command) = @_;
-    Database::Server::CommandResult->new(@command);
+    $error_check->(Database::Server::CommandResult->new(@command));
   }
   
   sub restart
@@ -53,41 +56,20 @@ package Database::Server::Role::Server {
 package Database::Server::Role::Result {
 
   use Moose::Role;
+  use overload '""' => sub { shift->as_string };
   use namespace::autoclean;
   
   requires 'is_success';
+  requires 'as_string';
 
 }
 
-package Database::Server::CommandResult {
+package Database::Server::Role::ProcessResult {
 
-  use Moose;
-  use Capture::Tiny qw( capture );
-  use Carp qw( croak );
-  use experimental qw( postderef );
+  use Moose::Role;
   use namespace::autoclean;
-
+  
   with 'Database::Server::Role::Result';
-
-  sub BUILDARGS
-  {
-    my $class = shift;
-    my %args = ( command => [map { "$_" } @_] );
-    
-    ($args{out}, $args{err}) = capture { system $args{command}->@* };
-    croak "failed to execute @{[ $args{command}->@* ]}: $?" if $? == -1;
-    my $signal = $? & 127;
-    croak "command @{[ $args{command}->@* ]} killed by signal $signal" if $args{signal};
-
-    $args{exit}   = $args{signal} ? 0 : $? >> 8;
-        
-    \%args;
-  }
-
-  has command => (
-    is  => 'ro',
-    isa => 'ArrayRef[Str]',
-  );
 
   has out => (
     is  => 'ro',
@@ -107,6 +89,47 @@ package Database::Server::CommandResult {
   sub is_success
   {
     !shift->exit;
+  }
+  
+  has command => (
+    is  => 'ro',
+    isa => 'ArrayRef[Str]',
+  );
+
+}
+
+package Database::Server::CommandResult {
+
+  use Moose;
+  use Capture::Tiny qw( capture );
+  use Carp qw( croak );
+  use experimental 'postderef';
+  use namespace::autoclean;
+
+  with 'Database::Server::Role::ProcessResult';
+
+  sub BUILDARGS
+  {
+    my $class = shift;
+    my %args = ( command => [map { "$_" } @_] );
+    
+    ($args{out}, $args{err}) = capture { system $args{command}->@* };
+    croak "failed to execute @{[ $args{command}->@* ]}: $?" if $? == -1;
+    my $signal = $? & 127;
+    croak "command @{[ $args{command}->@* ]} killed by signal $signal" if $args{signal};
+
+    $args{exit}   = $args{signal} ? 0 : $? >> 8;
+        
+    \%args;
+  }
+
+  sub as_string
+  {
+    my($self) = @_;
+    my $str = "'% @{[ $self->command->@* ]}' failed with exit @{[ $self->exit ]}";
+    $str .= "\n[out]\n" . $self->out if $self->out;
+    $str .= "\n[err]\n" . $self->err if $self->err;
+    $str;
   }
   
   __PACKAGE__->meta->make_immutable;
