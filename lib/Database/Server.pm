@@ -188,12 +188,14 @@ package Database::Server::CommandResult::NoBackground {
       }
       
       require JSON::PP;
-      $dir->file('status.json')->spew(
-        JSON::PP::encode_json({
-          signal => $exit & 128,
-          exit   => $exit >> 8,
-        }),
-      );
+      eval {
+        $dir->file('status.json')->spew(
+          JSON::PP::encode_json({
+            signal => $exit & 128,
+            exit   => $exit >> 8,
+          }),
+        )
+      };
 
       exit;
     }
