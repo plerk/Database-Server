@@ -53,6 +53,17 @@ package Database::Server::Role::Server {
     $error_check->(Database::Server::CommandResult::NoBackground->new(@command, sub { $self->is_up }));    
   }
   
+  sub good
+  {
+    Database::Server::SimpleResult->new;
+  }
+  
+  sub fail
+  {
+    my($message) = @_;
+    Database::Server::SimpleResult->new( message => $message, ok => 0 );
+  }
+  
   sub restart
   {
     my($self) = @_;
@@ -70,6 +81,21 @@ package Database::Server::Role::Result {
   
   requires 'is_success';
   requires 'as_string';
+
+}
+
+package Database::Server::SimpleResult {
+
+  use Moose;
+  use namespace::autoclean;
+  
+  with 'Database::Server::Role::Result';
+  
+  has message => ( is => 'ro', isa => 'Str', default => '' );
+  has ok      => ( is => 'ro', isa => 'Str', default => 1  );
+  
+  sub is_success { shift->ok }
+  sub as_string  { shift->message }
 
 }
 

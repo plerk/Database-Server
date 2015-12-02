@@ -1,5 +1,7 @@
 Capture::Tiny
 ExtUtils::MakeMaker
 Moose
+POSIX
+Path::Class
 Test::More
 namespace::autoclean
