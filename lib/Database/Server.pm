@@ -73,6 +73,27 @@ package Database::Server::Role::Server {
 
 }
 
+package Database::Server::DBI {
+
+  use Moose;
+  use experimental 'postderef';
+  use Module::Load::Conditional qw( check_install );
+  use namespace::autoclean;
+
+  has possible_drivers => (
+    is       => 'ro',
+    isa      => 'ArrayRef[Str]',
+    required => 1,
+  );
+  
+  sub available_drivers
+  {
+    [grep { check_install module => "DBD::$_" } shift->possible_drivers->@*];
+  };
+  
+  __PACKAGE__->meta->make_immutable;
+}
+
 package Database::Server::Role::Result {
 
   use Moose::Role;
