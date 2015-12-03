@@ -12,7 +12,7 @@ $dir->file('DBD', 'Foo.pm')->spew('package DBD::Foo; 1');
 $dir->file('DBD', 'Bar.pm')->spew('package DBD::Foo; 1');
 unshift @INC, "$dir";
 
-my $dbi = Database::Server::DBI->new(
+my $dbi = Database::Server::TemplateDSNGenerator->new(
   templates => {
     Foo => 'dbi:Foo:database={ $dbname };server={ $server };port={ $port }',
     Bar => 'dbi:Bar:database={ $dbname };server={ $server };port={ $port }',
@@ -21,7 +21,7 @@ my $dbi = Database::Server::DBI->new(
   possible_drivers => [qw( Foo Bar Baz )],
 );
 
-isa_ok $dbi, 'Database::Server::DBI';
+isa_ok $dbi, 'Database::Server::TemplateDSNGenerator';
 
 is_deeply $dbi->available_drivers, [qw( Foo Bar )], 'dbi.available_drivers';
 

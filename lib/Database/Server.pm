@@ -73,14 +73,37 @@ package Database::Server::Role::Server {
 
 }
 
-package Database::Server::DBI {
+package Database::Server::Role::DSNGenerator {
+
+  use Moose::Role;
+  use experimental 'postderef';
+  use Module::Load::Conditional qw( check_install );
+  use namespace::autoclean;
+  
+  has possible_drivers => (
+    is      => 'ro',
+    isa     => 'ArrayRef[Str]',
+    default => sub { [] },
+  );
+
+  sub available_drivers
+  {
+    [grep { check_install module => "DBD::$_" } shift->possible_drivers->@*];
+  };
+
+  requires 'dsn';
+  
+}
+
+package Database::Server::TemplateDSNGenerator {
 
   use Moose;
   use experimental 'postderef';
-  use Module::Load::Conditional qw( check_install );
   use Text::Template;
   use Carp qw( croak );
   use namespace::autoclean;
+
+  with 'Database::Server::Role::DSNGenerator';
 
   has templates => (
     is       => 'ro',
@@ -88,17 +111,10 @@ package Database::Server::DBI {
     required => 1,
   );
 
-  has possible_drivers => (
-    is       => 'ro',
-    isa      => 'ArrayRef[Str]',
+  has '+possible_drivers' => (
     lazy     => 1,
     default  => sub { [keys shift->templates->%*] },
   );
-  
-  sub available_drivers
-  {
-    [grep { check_install module => "DBD::$_" } shift->possible_drivers->@*];
-  };
   
   sub dsn
   {
