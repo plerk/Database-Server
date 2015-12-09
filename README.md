@@ -1,4 +1,4 @@
-# Database::Server
+# Database::Server [![Build Status](https://secure.travis-ci.org/plicease/Database-Server.png)](http://travis-ci.org/plicease/Database-Server)
 
 Base classes and roles for interacting with database server instances
 
