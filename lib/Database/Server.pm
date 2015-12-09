@@ -160,6 +160,7 @@ package Database::Server::SimpleResult {
 package Database::Server::Role::ProcessResult {
 
   use Moose::Role;
+  use experimental 'postderef';
   use namespace::autoclean;
   
   with 'Database::Server::Role::Result';
