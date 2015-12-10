@@ -1,6 +1,8 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+
+0.02      2015-12-09 20:19:14 -0500
   - Old create method renamed to init
   - New create is a class method to create and init an
     instance
