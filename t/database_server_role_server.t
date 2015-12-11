@@ -55,6 +55,13 @@ package
     shift->_up;
   }
 
+  sub list_databases {}
+  sub create_database {}
+  sub drop_database {}
+  sub shell {}
+  sub interactive_shell {}
+  sub dsn {}
+
 }
 
 subtest 'Database::Server::Role::Server#run' => sub {

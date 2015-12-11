@@ -34,6 +34,13 @@ package Database::Server::Role::Server {
   requires 'start';
   requires 'stop';
   requires 'is_up';
+  
+  requires 'list_databases';
+  requires 'create_database';
+  requires 'drop_database';
+  requires 'interactive_shell';
+  requires 'shell';
+  requires 'dsn';
 
   sub run
   {
