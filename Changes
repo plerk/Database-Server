@@ -1,6 +1,8 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+
+0.03      2015-12-12 04:34:49 -0500
   - Added requires for create/drop database
   - Added requires for shell interaction
   - Added requires for dsn/DBI interaction
