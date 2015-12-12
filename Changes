@@ -1,6 +1,9 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+  - Added requires for create/drop database
+  - Added requires for shell interaction
+  - Added requires for dsn/DBI interaction
 
 0.02      2015-12-09 20:19:14 -0500
   - Old create method renamed to init

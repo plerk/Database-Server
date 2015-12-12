@@ -80,64 +80,6 @@ package Database::Server::Role::Server {
 
 }
 
-package Database::Server::Role::DSNGenerator {
-
-  use Moose::Role;
-  use experimental 'postderef';
-  use Module::Load::Conditional qw( check_install );
-  use namespace::autoclean;
-  
-  has possible_drivers => (
-    is      => 'ro',
-    isa     => 'ArrayRef[Str]',
-    default => sub { [] },
-  );
-
-  sub available_drivers
-  {
-    [grep { check_install module => "DBD::$_" } shift->possible_drivers->@*];
-  };
-
-  requires 'dsn';
-  
-}
-
-package Database::Server::TemplateDSNGenerator {
-
-  use Moose;
-  use experimental 'postderef';
-  use Text::Template;
-  use Carp qw( croak );
-  use namespace::autoclean;
-
-  with 'Database::Server::Role::DSNGenerator';
-
-  has templates => (
-    is       => 'ro',
-    isa      => 'HashRef[Str]',
-    required => 1,
-  );
-
-  has '+possible_drivers' => (
-    lazy     => 1,
-    default  => sub { [keys shift->templates->%*] },
-  );
-  
-  sub dsn
-  {
-    my($self, $driver, $hash) = @_;
-    $driver //= $self->available_drivers->[0];
-    croak "No drivers available (possible drivers include @{[ map { 'DBD::'.$_ } $self->possible_drivers->@* ]}" unless defined $driver;
-    Text::Template->new(
-      TYPE    => 'STRING',
-      SOURCE  => $self->templates->{$driver},
-      #PREPEND => 'use strict; use warnings; ',
-    )->fill_in(HASH => $hash, BROKEN => sub { die "bad template: ", $self->templates->{$driver} });
-  }
-  
-  __PACKAGE__->meta->make_immutable;
-}
-
 package Database::Server::Role::Result {
 
   use Moose::Role;
