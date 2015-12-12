@@ -1,9 +1,0 @@
-Capture::Tiny
-ExtUtils::MakeMaker
-Module::Load::Conditional
-Moose
-POSIX
-Path::Class
-Test::More
-Text::Template
-namespace::autoclean
