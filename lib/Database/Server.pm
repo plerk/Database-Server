@@ -210,8 +210,7 @@ package Database::Server::CommandResult::NoBackground {
       my $pid2 = fork;
       if($pid2 == 0)
       {
-        exec $args{command}->@*;
-        exit 2;
+        exit 2 unless exec $args{command}->@*;
       }
       
       my $exit = 0;
