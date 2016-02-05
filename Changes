@@ -1,6 +1,8 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+
+0.04      2016-02-05 15:31:27 -0500
   - rename Role::Server->shell to Role::Server->load
   - Added Role::Server->diff method
 
