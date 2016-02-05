@@ -58,7 +58,8 @@ package
   sub list_databases {}
   sub create_database {}
   sub drop_database {}
-  sub shell {}
+  sub load {}
+  sub dump {}
   sub interactive_shell {}
   sub dsn {}
 
