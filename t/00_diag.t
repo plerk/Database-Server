@@ -12,10 +12,14 @@ my $post_diag;
 $modules{$_} = $_ for qw(
   Capture::Tiny
   ExtUtils::MakeMaker
+  File::Which
+  File::chdir
   Moose
   POSIX
   Path::Class
+  Ref::Util
   Test::More
+  Text::Diff
   namespace::autoclean
 );
 
