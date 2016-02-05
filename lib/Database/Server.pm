@@ -27,6 +27,8 @@ Returns an unused TCP port number.
 package Database::Server::Role::Server {
 
   use Moose::Role;
+  use File::chdir;
+  use Ref::Util qw( is_scalarref );
   use namespace::autoclean;
   
   requires 'create';
@@ -77,6 +79,66 @@ package Database::Server::Role::Server {
     my($self) = @_;
     $self->stop if $self->is_up;
     $self->start;
+  }
+
+  sub diff
+  {
+    my @db;
+    my $self;
+    my @options;
+    ($self, $db[0], $db[1], @options) = @_;
+    require File::Which;
+    if(my $diff_exe = File::Which::which('diff'))
+    {
+      require Path::Class;
+      require File::Temp;
+      my $dir = Path::Class::Dir->new(File::Temp::tempdir( CLEANUP => 1 ));
+      local $CWD = $dir;
+
+      my @fn = qw( a.sql b.sql );
+
+      foreach my $i (0,1)
+      {
+        if(is_scalarref $db[$i])
+        {
+          $dir->file($fn[$i])->spew($db[$i]);
+        }
+        else
+        {
+          $fn[$i] = "$db[$i].sql";
+          $self->dump($db[$i], $fn[$i], @options);
+        }
+      }
+      
+      my $ret = $self->run($diff_exe, -u => @fn, sub { return shift });
+      
+      return $ret->out;
+
+    }
+    else
+    {
+      my @fn = qw( a.sql b.sql );
+      
+      foreach my $i (0,1)
+      {
+        if(is_scalarref $db[$i])
+        {
+          # nothing
+        }
+        else
+        {
+          require Path::Class;
+          $fn[$i] = Path::Class::File->new($db[$i])->basename . '.sql';
+          my $name = $db[$i];
+          my $data = '';
+          $db[$i] = \$data;
+          $self->dump($name, $db[$i], @options);
+        }
+      }
+      
+      require Text::Diff;
+      return Text::Diff::diff( $db[0], $db[1], { FILENAME_A => $fn[0], FILENAME_B => $fn[1] } );
+    }
   }
 
 }

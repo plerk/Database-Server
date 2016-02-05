@@ -2,6 +2,7 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
   - rename Role::Server->shell to Role::Server->load
+  - Added Role::Server->diff method
 
 0.03      2015-12-12 04:34:49 -0500
   - Added requires for create/drop database
